@@ -1,0 +1,6 @@
+{
+  "name": "পুণ্যতার গল্প",
+  "description": "একটি আধুনিক বাংলা গল্প ও ছন্দ পড়ার রিডার অ্যাপ্লিকেশন, যেখানে বাস্তব বইয়ের পাতার অনুভূতিসহ অফলাইন লাইব্রেরি এবং কাস্টম হাইলাইটার ও নোটের সুবিধা রয়েছে।",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

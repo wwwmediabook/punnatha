@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>পুণ্যতার গল্প - এডমিন প্যানেল</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js for Graph -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Google Fonts for Bengali and English -->
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Firebase Compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1C3A4B',
+            secondary: '#0F2027',
+            accent: '#FFD700',
+            panelBg: '#F4F6F9',
+            cardBg: '#FFFFFF',
+            accentDark: '#E5C100'
+          },
+          fontFamily: {
+            bengali: ['Hind Siliguri', 'sans-serif'],
+            sans: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Hind Siliguri', 'Inter', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #1C3A4B;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-panelBg text-slate-800 min-h-screen flex flex-col">
+
+  <!-- HEADER BANNER -->
+  <header class="bg-gradient-to-r from-secondary via-primary to-secondary text-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-4 md:py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center space-x-3 rtl:space-x-reverse">
+        <div class="w-12 h-12 rounded-xl bg-accent flex items-center justify-center text-secondary text-2xl shadow-lg">
+          <i class="fa-solid fa-book-open"></i>
+        </div>
+        <div>
+          <h1 class="text-xl md:text-2xl font-bold tracking-tight text-white">পুণ্যতার গল্প</h1>
+          <p class="text-xs text-accent font-semibold tracking-wider uppercase">পাবলিশার কন্ট্রোল সেন্টার & এডমিন ড্যাশবোর্ড</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-4">
+        <div class="text-right hidden md:block">
+          <p class="text-xs text-slate-300">লগইন প্রোফাইল</p>
+          <p class="text-sm font-semibold text-accent"><i class="fa-solid fa-user-shield mr-1"></i> Md Medul (ডেভেলপার)</p>
+        </div>
+        <button id="logoutBtn" onclick="logoutAdmin()" class="bg-red-600/20 hover:bg-red-600 border border-red-500/30 text-red-200 hover:text-white px-3 py-1.5 rounded-lg text-sm transition-all flex items-center gap-2">
+          <i class="fa-solid fa-sign-out-alt"></i> প্রস্থান করুন
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:py-8 grid grid-cols-1 gap-6">
+    
+    <!-- STATS PANEL & ANALYTICS CONTAINER -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- STATS COUNTERS -->
+      <div class="lg:col-span-1 grid grid-cols-2 gap-4">
+        <!-- Stat Item: Stories -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all">
+          <div class="flex justify-between items-start">
+            <div class="p-3 bg-primary/10 text-primary rounded-xl">
+              <i class="fa-solid fa-book text-xl"></i>
+            </div>
+            <span class="text-xs font-semibold px-2 py-0.5 bg-green-100 text-green-700 rounded-full">সক্রিয়</span>
+          </div>
+          <div class="mt-4">
+            <p class="text-slate-400 text-xs md:text-sm">সর্বমোট গল্প</p>
+            <h3 id="totalStoriesCount" class="text-2xl md:text-3xl font-extrabold text-primary mt-1">০</h3>
+          </div>
+        </div>
+
+        <!-- Stat Item: Rhymes -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all">
+          <div class="flex justify-between items-start">
+            <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+              <i class="fa-solid fa-music text-xl"></i>
+            </div>
+            <span class="text-xs font-semibold px-2 py-0.5 bg-green-100 text-green-700 rounded-full">সক্রিয়</span>
+          </div>
+          <div class="mt-4">
+            <p class="text-slate-400 text-xs md:text-sm">সর্বমোট ছন্দ</p>
+            <h3 id="totalChondosCount" class="text-2xl md:text-3xl font-extrabold text-indigo-600 mt-1">০</h3>
+          </div>
+        </div>
+
+        <!-- Stat Item: Active Readers -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all">
+          <div class="flex justify-between items-start">
+            <div class="p-3 bg-amber-50 text-amber-600 rounded-xl">
+              <i class="fa-solid fa-users text-xl"></i>
+            </div>
+            <span class="text-xs font-semibold px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">আজকের</span>
+          </div>
+          <div class="mt-4">
+            <p class="text-slate-400 text-xs md:text-sm">দৈনিক পাঠক</p>
+            <h3 id="dailyActiveUsers" class="text-2xl md:text-3xl font-extrabold text-amber-600 mt-1">৫,৮৯০</h3>
+          </div>
+        </div>
+
+        <!-- Stat Item: Total Downloads -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all">
+          <div class="flex justify-between items-start">
+            <div class="p-3 bg-rose-50 text-rose-600 rounded-xl">
+              <i class="fa-solid fa-cloud-arrow-down text-xl"></i>
+            </div>
+            <span class="text-xs font-semibold px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full">লাইভ</span>
+          </div>
+          <div class="mt-4">
+            <p class="text-slate-400 text-xs md:text-sm">ইন্সটল সংখ্যা</p>
+            <h3 id="totalInstalls" class="text-2xl md:text-3xl font-extrabold text-rose-600 mt-1">১২,৪৫০+</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISITOR ANALYTICS GRAPH (Daily Visit Column/Line Chart) -->
+      <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <h3 class="font-bold text-slate-800 text-md md:text-lg"><i class="fa-solid fa-chart-line text-primary mr-2"></i>দৈনিক ভিজিটর অ্যানালিটিক্স</h3>
+            <p class="text-xs text-slate-400">বিগত ৭ দিনের দৈনিক অ্যাপ ট্রাফিকের বিশ্লেষণাত্মক গ্রাফ চিত্র</p>
+          </div>
+          <div class="flex gap-2">
+            <span class="text-xs font-semibold bg-accent/20 text-secondary border border-accent/30 px-2 py-1 rounded-md">আপডেট: লাইভ</span>
+          </div>
+        </div>
+        
+        <!-- Canvas wrapper -->
+        <div class="relative w-full h-52">
+          <canvas id="visitorChart"></canvas>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- CONTENT MANAGEMENT WORKSPACE -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- FORM COLUMN (UPLOAD & EDIT) -->
+      <div class="lg:col-span-5 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <!-- Form Header with Switch Tabs -->
+        <div class="bg-primary text-white p-1 flex">
+          <button id="formTabStory" onclick="switchFormTab('story')" class="flex-1 py-3 text-center text-sm font-bold transition-all bg-accent text-secondary rounded-xl flex items-center justify-center gap-2">
+            <i class="fa-solid fa-book-open"></i> নতুন গল্প আপলোড
+          </button>
+          <button id="formTabChondo" onclick="switchFormTab('chondo')" class="flex-1 py-3 text-center text-sm font-bold text-slate-300 hover:text-white transition-all flex items-center justify-center gap-2">
+            <i class="fa-solid fa-feather"></i> নতুন ছন্দ আপলোড
+          </button>
+        </div>
+
+        <!-- FORM INNER BODY -->
+        <div class="p-6">
+          <form id="contentForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+            <!-- Hidden inputs to track edits -->
+            <input type="hidden" id="editItemId" value="">
+            <input type="hidden" id="activeFormType" value="story">
+
+            <!-- Title Field -->
+            <div>
+              <label id="titleLabel" class="block text-sm font-bold text-slate-700 mb-1" for="titleInput">গল্পের শিরোনাম / নাম <span class="text-red-500">*</span></label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-bookmark"></i></span>
+                <input type="text" id="titleInput" required placeholder="গল্পের মূল নাম লিখুন..." class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm">
+              </div>
+            </div>
+
+            <!-- Author Field -->
+            <div>
+              <label id="authorLabel" class="block text-sm font-bold text-slate-700 mb-1" for="authorInput">লেখকের নাম <span class="text-red-500">*</span></label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-user-pen"></i></span>
+                <input type="text" id="authorInput" required placeholder="লেখকের নাম লিখুন..." class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm">
+              </div>
+            </div>
+
+            <!-- Category & Page Count Wrapper (Visible only for Stories) -->
+            <div id="storySpecsWrapper" class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-bold text-slate-700 mb-1" for="categorySelect">বিভাগ নির্বাচন করুন</label>
+                <select id="categorySelect" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm">
+                  <option value="শিক্ষা ও নৈতিকতা">শিক্ষা ও নৈতিকতা</option>
+                  <option value="অনুপ্রেরণামূলক">অনুপ্রেরণামূলক</option>
+                  <option value="জীবনমুখী">জীবনমুখী</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-bold text-slate-700 mb-1" for="pageCountInput">গল্পের সম্ভাব্য পৃষ্ঠা</label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-pager"></i></span>
+                  <input type="number" id="pageCountInput" min="1" max="100" value="5" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm">
+                </div>
+              </div>
+            </div>
+
+            <!-- Gradient Index Selector (Visible only for Rhymes) -->
+            <div id="chondoSpecsWrapper" class="hidden">
+              <label class="block text-sm font-bold text-slate-700 mb-1">কার্ড গ্রেডিয়েন্ট স্টাইল</label>
+              <div class="grid grid-cols-5 gap-2">
+                <button type="button" onclick="selectGradient(0)" class="gradient-option h-10 rounded-lg bg-gradient-to-tr from-pink-500 via-red-500 to-yellow-500 border-2 border-primary" data-index="0"></button>
+                <button type="button" onclick="selectGradient(1)" class="gradient-option h-10 rounded-lg bg-gradient-to-tr from-slate-900 via-slate-800 to-slate-700 border-2 border-transparent" data-index="1"></button>
+                <button type="button" onclick="selectGradient(2)" class="gradient-option h-10 rounded-lg bg-gradient-to-tr from-teal-500 to-green-500 border-2 border-transparent" data-index="2"></button>
+                <button type="button" onclick="selectGradient(3)" class="gradient-option h-10 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-500 border-2 border-transparent" data-index="3"></button>
+                <button type="button" onclick="selectGradient(4)" class="gradient-option h-10 rounded-lg bg-gradient-to-tr from-orange-500 to-yellow-500 border-2 border-transparent" data-index="4"></button>
+              </div>
+              <input type="hidden" id="gradientIndexInput" value="0">
+            </div>
+
+            <!-- Description Field (Only for Stories) -->
+            <div id="descriptionWrapper">
+              <label class="block text-sm font-bold text-slate-700 mb-1" for="descriptionInput">সংক্ষিপ্ত স্লোগান বা বিবরণ</label>
+              <textarea id="descriptionInput" rows="2" placeholder="যেমন: নৈতিকতা ও সততার দারুণ জয়গাঁথা..." class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm"></textarea>
+            </div>
+
+            <!-- Content Area -->
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label id="contentLabel" class="block text-sm font-bold text-slate-700" for="contentInput">গল্পের সম্পূর্ণ বিবরণ / পাঠ <span class="text-red-500">*</span></label>
+                <span id="storyFormattingTip" class="text-[10px] text-indigo-600 font-semibold cursor-help" title="অধ্যায় বিভাজনের জন্য শুরুতে [Chapter: অধ্যায়ের নাম] ট্যাগ বসান">
+                  <i class="fa-solid fa-circle-info mr-0.5"></i> অধ্যায় ফরম্যাটিং টিপস
+                </span>
+              </div>
+              <textarea id="contentInput" required rows="8" placeholder="গল্পের মূল লেখা লিখুন... অধ্যায় বিভাজনের জন্য লাইনের শুরুতে লিখুন [Chapter: অধ্যায় ১]" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm font-mono custom-scrollbar"></textarea>
+            </div>
+
+            <!-- Submit Button / Actions -->
+            <div class="flex gap-3 pt-2">
+              <button type="button" id="cancelEditBtn" onclick="resetFormState()" class="hidden flex-1 py-3 text-sm font-bold border border-slate-200 hover:bg-slate-100 rounded-xl transition-all">
+                বাতিল করুন
+              </button>
+              <button type="submit" id="submitBtn" class="flex-2 w-full bg-primary hover:bg-secondary text-accent hover:text-white py-3.5 px-6 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
+                <i class="fa-solid fa-cloud-arrow-up"></i> <span id="submitBtnText">গল্পটি প্রকাশ করুন</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- LIVE LIST COLUMN -->
+      <div class="lg:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        
+        <!-- List Header & Search Filter Bar -->
+        <div class="p-6 border-b border-slate-100 space-y-4">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div>
+              <h2 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-folder-open text-primary mr-1.5"></i> প্রকাশিত কনটেন্ট সমূহ</h2>
+              <p class="text-xs text-slate-400">এখান থেকে রিয়েল-টাইমে সব তথ্য এডিট ও ডিলিট করতে পারবেন</p>
+            </div>
+            
+            <!-- Type Toggle Filter -->
+            <div class="inline-flex bg-slate-100 p-1 rounded-xl">
+              <button onclick="toggleListFilter('story')" id="listFilterStory" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-white text-primary shadow-sm transition-all">
+                গল্প তালিকা
+              </button>
+              <button onclick="toggleListFilter('chondo')" id="listFilterChondo" class="px-4 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-primary transition-all">
+                ছন্দ তালিকা
+              </button>
+            </div>
+          </div>
+
+          <!-- Search box -->
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-magnifying-glass"></i></span>
+            <input type="text" id="searchInput" oninput="filterContentList()" placeholder="গল্প বা লেখকের নাম দিয়ে সার্চ করুন..." class="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-100 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary text-sm transition-all">
+          </div>
+        </div>
+
+        <!-- ITEMS CONTAINER -->
+        <div class="p-6 h-[550px] overflow-y-auto custom-scrollbar bg-slate-50/50">
+          <div id="loadingIndicator" class="flex flex-col items-center justify-center h-full space-y-3">
+            <div class="w-10 h-10 border-4 border-primary border-t-accent rounded-full animate-spin"></div>
+            <p class="text-xs text-slate-500 font-medium">ফায়ারবেস ডেটাবেজ লোড হচ্ছে...</p>
+          </div>
+
+          <div id="noContentPlaceholder" class="hidden flex-col items-center justify-center h-full text-center p-8 space-y-3">
+            <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 text-2xl">
+              <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-700">কোনো তথ্য পাওয়া যায়নি!</h4>
+              <p class="text-xs text-slate-400 max-w-sm mx-auto mt-1">এই তালিকায় কোনো গল্প বা ছন্দ পাওয়া যায়নি। নতুন আইটেম আপলোড করতে পাশের ফর্ম ব্যবহার করুন।</p>
+            </div>
+          </div>
+
+          <div id="storiesList" class="space-y-4">
+            <!-- Dynamic Stories Appended Here -->
+          </div>
+
+          <div id="chondosList" class="hidden space-y-4">
+            <!-- Dynamic Chondos Appended Here -->
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- CONFIRM DELETE MODAL -->
+  <div id="deleteModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl transform scale-95 transition-transform duration-300">
+      <div class="text-center">
+        <div class="w-14 h-14 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto text-xl mb-4">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h3 class="text-lg font-bold text-slate-800">আপনি কি নিশ্চিত?</h3>
+        <p class="text-sm text-slate-500 mt-2">একবার ডিলিট করলে এটি ফায়ারবেস ডেটাবেজ থেকে চিরতরে মুছে যাবে এবং ব্যবহারকারীদের অ্যাপ থেকেও চলে যাবে!</p>
+      </div>
+      
+      <!-- Modal info box -->
+      <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 mt-4 text-left">
+        <p class="text-xs font-semibold text-slate-400 uppercase">মুছে ফেলা হচ্ছে</p>
+        <p id="deleteItemTitle" class="text-sm font-bold text-slate-800 mt-0.5 truncate">আইটেমের নাম</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 mt-6">
+        <button onclick="closeDeleteModal()" class="py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 text-sm font-bold transition-all">
+          বাতিল করুন
+        </button>
+        <button id="confirmDeleteBtn" class="py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-bold transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-red-600/20">
+          <i class="fa-solid fa-trash-can"></i> মুছে ফেলুন
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-10 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-3 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-lg border border-slate-800">
+    <span id="toastIcon" class="text-accent text-lg"><i class="fa-solid fa-circle-check"></i></span>
+    <span id="toastMessage" class="text-sm font-semibold text-slate-200">সফলভাবে সম্পন্ন হয়েছে!</span>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-secondary text-slate-400 text-center py-6 border-t border-slate-800/80 mt-12 text-xs md:text-sm">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+      <p>© ২০২৬ পুণ্যতার গল্প। সর্বস্বত্ব সংরক্ষিত।</p>
+      <p class="font-semibold text-accent">ডিজাইন ও ডেভেলপমেন্ট: Md Medul (মেদুল)</p>
+    </div>
+  </footer>
+
+  <!-- CORE JAVASCRIPT & DATABASE MANAGEMENT -->
+  <script>
+    // Firebase Configuration Injecting user credentials
+    const firebaseConfig = {
+      apiKey: "AIzaSyBv1DQa-7AKcW6KL6H76xYdR9xVn6rk9ck",
+      authDomain: "linkcash-cc3c3.firebaseapp.com",
+      databaseURL: "https://linkcash-cc3c3-default-rtdb.firebaseio.com",
+      projectId: "linkcash-cc3c3",
+      storageBucket: "linkcash-cc3c3.firebasestorage.app",
+      messagingSenderId: "664464164521",
+      appId: "1:664464164521:android:719133132e8a7f8847cbb8"
+    };
+
+    // Initialize Firebase Compat Mode
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Local in-memory states
+    let stories = {};
+    let chondos = {};
+    let activeFormTab = 'story';
+    let activeListFilter = 'story';
+    let chartInstance = null;
+
+    // Daily Traffic simulated graph data (can also write analytics to firebase)
+    const analyticsDays = ['সোম', 'মঙ্গল', 'বুধ', 'বৃহস্পতি', 'শুক্র', 'শনি', 'রবি'];
+    const analyticsVisits = [450, 620, 580, 890, 720, 1100, 1450]; // Beautiful progressive curves
+
+    // Initialize Page
+    document.addEventListener("DOMContentLoaded", () => {
+      initChart();
+      listenToFirebase();
+      trackRealtimeVisits();
+    });
+
+    // Handle Realtime traffic updates to DB path /analytics/daily_visits
+    function trackRealtimeVisits() {
+      const todayIndex = new Date().getDay(); // 0 (Sun) - 6 (Sat)
+      const daysMapped = [6, 0, 1, 2, 3, 4, 5]; // Match analyticsDays starting Mon
+      const monIdx = daysMapped[todayIndex];
+
+      const visitsRef = database.ref('analytics/daily_visits/' + monIdx);
+      visitsRef.once('value').then((snapshot) => {
+        let count = snapshot.val();
+        if (!count) {
+          count = analyticsVisits[monIdx];
+        }
+        // Increment visitor count by 1 for the session
+        count += 1;
+        visitsRef.set(count);
+      });
+
+      // Synchronize entire week values with graph from DB
+      database.ref('analytics/daily_visits').on('value', (snapshot) => {
+        const val = snapshot.val();
+        if (val) {
+          for (let i = 0; i < 7; i++) {
+            if (val[i]) {
+              analyticsVisits[i] = val[i];
+            }
+          }
+          if (chartInstance) {
+            chartInstance.data.datasets[0].data = analyticsVisits;
+            chartInstance.update();
+          }
+          // Update visual stats counter
+          document.getElementById("dailyActiveUsers").innerText = (analyticsVisits[monIdx] || 0).toLocaleString('bn-BD');
+        }
+      });
+    }
+
+    // Chart.js Setup for Traffic Graph
+    function initChart() {
+      const ctx = document.getElementById('visitorChart').getContext('2d');
+      
+      const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+      gradient.addColorStop(0, 'rgba(28, 58, 75, 0.4)');
+      gradient.addColorStop(1, 'rgba(28, 58, 75, 0.0)');
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: analyticsDays,
+          datasets: [{
+            label: 'অ্যাপ ভিজিটর সংখ্যা',
+            data: analyticsVisits,
+            borderColor: '#1C3A4B',
+            borderWidth: 3,
+            backgroundColor: gradient,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#FFD700',
+            pointBorderColor: '#1C3A4B',
+            pointRadius: 5,
+            pointHoverRadius: 7
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(0, 0, 0, 0.04)'
+              },
+              ticks: {
+                font: {
+                  family: 'Hind Siliguri'
+                }
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                font: {
+                  family: 'Hind Siliguri'
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Fetch and Listen in Realtime to Firebase Realtime Database Nodes
+    function listenToFirebase() {
+      // Stories Listener
+      database.ref('stories').on('value', (snapshot) => {
+        stories = snapshot.val() || {};
+        document.getElementById("totalStoriesCount").innerText = Object.keys(stories).length.toLocaleString('bn-BD');
+        renderContentList();
+      }, (error) => {
+        showToast("Error loading stories: " + error.message, true);
+      });
+
+      // Chondos Listener
+      database.ref('chondos').on('value', (snapshot) => {
+        chondos = snapshot.val() || {};
+        document.getElementById("totalChondosCount").innerText = Object.keys(chondos).length.toLocaleString('bn-BD');
+        renderContentList();
+      }, (error) => {
+        showToast("Error loading rhymes: " + error.message, true);
+      });
+    }
+
+    // Tab Switchers in Creator Form (Story / Chondo)
+    function switchFormTab(type) {
+      if (type === activeFormTab) return;
+      activeFormTab = type;
+      document.getElementById("activeFormType").value = type;
+
+      const storyTab = document.getElementById("formTabStory");
+      const chondoTab = document.getElementById("formTabChondo");
+      const specsStory = document.getElementById("storySpecsWrapper");
+      const specsChondo = document.getElementById("chondoSpecsWrapper");
+      const descWrapper = document.getElementById("descriptionWrapper");
+      
+      const titleLabel = document.getElementById("titleLabel");
+      const titleInput = document.getElementById("titleInput");
+      const authorLabel = document.getElementById("authorLabel");
+      const authorInput = document.getElementById("authorInput");
+      const contentLabel = document.getElementById("contentLabel");
+      const contentInput = document.getElementById("contentInput");
+      const submitBtnText = document.getElementById("submitBtnText");
+      const formattingTip = document.getElementById("storyFormattingTip");
+
+      if (type === 'story') {
+        // Switch layout to Story Creator
+        storyTab.className = "flex-1 py-3 text-center text-sm font-bold transition-all bg-accent text-secondary rounded-xl flex items-center justify-center gap-2";
+        chondoTab.className = "flex-1 py-3 text-center text-sm font-bold text-slate-300 hover:text-white transition-all flex items-center justify-center gap-2";
+        
+        specsStory.classList.remove("hidden");
+        specsChondo.classList.add("hidden");
+        descWrapper.classList.remove("hidden");
+        formattingTip.classList.remove("hidden");
+
+        titleLabel.innerText = "গল্পের শিরোনাম / নাম *";
+        titleInput.placeholder = "গল্পের মূল নাম লিখুন...";
+        authorLabel.innerText = "লেখকের নাম *";
+        authorInput.placeholder = "লেখকের নাম লিখুন...";
+        contentLabel.innerText = "গল্পের সম্পূর্ণ বিবরণ / পাঠ *";
+        contentInput.placeholder = "গল্পের মূল লেখা লিখুন... অধ্যায় বিভাজনের জন্য লাইনের শুরুতে লিখুন [Chapter: অধ্যায় ১]";
+        submitBtnText.innerText = "গল্পটি প্রকাশ করুন";
+      } else {
+        // Switch layout to Rhyme (Chondo) Creator
+        chondoTab.className = "flex-1 py-3 text-center text-sm font-bold transition-all bg-accent text-secondary rounded-xl flex items-center justify-center gap-2";
+        storyTab.className = "flex-1 py-3 text-center text-sm font-bold text-slate-300 hover:text-white transition-all flex items-center justify-center gap-2";
+        
+        specsStory.classList.add("hidden");
+        specsChondo.classList.remove("hidden");
+        descWrapper.classList.add("hidden");
+        formattingTip.classList.add("hidden");
+
+        titleLabel.innerText = "ছন্দের নাম / শিরোনাম *";
+        titleInput.placeholder = "ছন্দের নাম বা শিরোনাম লিখুন...";
+        authorLabel.innerText = "কবির নাম *";
+        authorInput.placeholder = "কবির নাম লিখুন...";
+        contentLabel.innerText = "ছন্দের চরণসমূহ (পঙ্ক্তি) *";
+        contentInput.placeholder = "ছন্দের মূল লাইনগুলো এক লাইনের পর আর এক লাইন হিসেবে সাজিয়ে লিখুন...";
+        submitBtnText.innerText = "ছন্দটি প্রকাশ করুন";
+      }
+
+      resetFormState(false); // Reset inputs without shifting active types
+    }
+
+    // Gradient Picker for Rhymes Card Styling
+    function selectGradient(idx) {
+      document.querySelectorAll(".gradient-option").forEach((opt) => {
+        opt.classList.remove("border-primary");
+        opt.classList.add("border-transparent");
+      });
+      document.querySelector(`.gradient-option[data-index="${idx}"]`).classList.remove("border-transparent");
+      document.querySelector(`.gradient-option[data-index="${idx}"]`).classList.add("border-primary");
+      document.getElementById("gradientIndexInput").value = idx;
+    }
+
+    // Toggle Content Management List filter between Stories and Rhymes
+    function toggleListFilter(type) {
+      if (type === activeListFilter) return;
+      activeListFilter = type;
+
+      const filterStory = document.getElementById("listFilterStory");
+      const filterChondo = document.getElementById("listFilterChondo");
+      const storiesBox = document.getElementById("storiesList");
+      const chondosBox = document.getElementById("chondosList");
+
+      if (type === 'story') {
+        filterStory.className = "px-4 py-1.5 rounded-lg text-xs font-bold bg-white text-primary shadow-sm transition-all";
+        filterChondo.className = "px-4 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-primary transition-all";
+        storiesBox.classList.remove("hidden");
+        chondosBox.classList.add("hidden");
+      } else {
+        filterChondo.className = "px-4 py-1.5 rounded-lg text-xs font-bold bg-white text-primary shadow-sm transition-all";
+        filterStory.className = "px-4 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-primary transition-all";
+        chondosBox.classList.remove("hidden");
+        storiesBox.classList.add("hidden");
+      }
+
+      filterContentList();
+    }
+
+    // Render the Live Stories & Rhymes grid with data from Firebase
+    function renderContentList() {
+      const loading = document.getElementById("loadingIndicator");
+      loading.classList.add("hidden");
+
+      const storiesBox = document.getElementById("storiesList");
+      const chondosBox = document.getElementById("chondosList");
+
+      storiesBox.innerHTML = "";
+      chondosBox.innerHTML = "";
+
+      // Convert stories object to array
+      const storiesArray = Object.values(stories);
+      const chondosArray = Object.values(chondos);
+
+      if (storiesArray.length === 0 && chondosArray.length === 0) {
+        document.getElementById("noContentPlaceholder").classList.remove("hidden");
+        return;
+      } else {
+        document.getElementById("noContentPlaceholder").classList.add("hidden");
+      }
+
+      // Populate Stories List
+      storiesArray.reverse().forEach((story) => {
+        const itemHtml = `
+          <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between hover:border-primary/20 hover:shadow-md transition-all search-item-node" data-title="${story.title}" data-author="${story.author}">
+            <div>
+              <div class="flex justify-between items-start gap-2">
+                <span class="text-[10px] font-bold px-2.5 py-1 bg-primary/10 text-primary rounded-full">${story.category || 'গল্প'}</span>
+                <span class="text-[10px] text-slate-400 font-semibold"><i class="fa-solid fa-clock"></i> ${story.publishDate || 'আজ'}</span>
+              </div>
+              <h4 class="font-bold text-slate-800 text-sm md:text-md mt-2 line-clamp-1">${story.title}</h4>
+              <p class="text-xs text-slate-500 font-medium mt-0.5"><i class="fa-solid fa-user-pen text-[10px] mr-1"></i> ${story.author}</p>
+              <p class="text-xs text-slate-400 line-clamp-2 mt-2 bg-slate-50 p-2 rounded-lg leading-relaxed italic border border-slate-100">${story.description || 'চমৎকার ও শিক্ষণীয় বাংলা গল্প।'}</p>
+            </div>
+
+            <!-- Card Actions -->
+            <div class="flex items-center justify-between border-t border-slate-100 mt-4 pt-3">
+              <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md"><i class="fa-solid fa-pager mr-0.5"></i> ${story.pageCount || (story.content ? Math.ceil(story.content.length / 450) : 5)} পৃষ্ঠা</span>
+              <div class="flex items-center gap-2">
+                <button onclick="prepareEditItem('story', ${story.id})" class="p-2 text-primary hover:bg-primary/5 rounded-lg text-xs transition-all font-bold flex items-center gap-1">
+                  <i class="fa-solid fa-pen-to-square"></i> এডিট
+                </button>
+                <button onclick="requestDeleteItem('story', ${story.id}, '${story.title.replace(/'/g, "\\'")}')" class="p-2 text-red-500 hover:bg-red-500/5 rounded-lg text-xs transition-all font-bold flex items-center gap-1">
+                  <i class="fa-solid fa-trash-can"></i> ডিলিট
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+        storiesBox.innerHTML += itemHtml;
+      });
+
+      // Populate Chondos List
+      const gradients = [
+        'bg-gradient-to-tr from-pink-500 via-red-500 to-yellow-500',
+        'bg-gradient-to-tr from-slate-900 via-slate-800 to-slate-700',
+        'bg-gradient-to-tr from-teal-500 to-green-500',
+        'bg-gradient-to-tr from-indigo-500 to-purple-500',
+        'bg-gradient-to-tr from-orange-500 to-yellow-500'
+      ];
+
+      chondosArray.reverse().forEach((chondo) => {
+        const bgGrad = gradients[chondo.gradientIndex % gradients.length];
+        const itemHtml = `
+          <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between hover:border-indigo-500/20 hover:shadow-md transition-all search-item-node" data-title="${chondo.title}" data-author="${chondo.author}">
+            <div>
+              <div class="flex justify-between items-center">
+                <span class="h-2 w-2 rounded-full ${bgGrad}"></span>
+                <span class="text-[10px] text-slate-400 font-semibold"><i class="fa-solid fa-clock"></i> ${chondo.publishDate || 'আজ'}</span>
+              </div>
+              <h4 class="font-bold text-slate-800 text-sm md:text-md mt-2 line-clamp-1">${chondo.title}</h4>
+              <p class="text-xs text-slate-500 font-medium mt-0.5"><i class="fa-solid fa-feather-pointed text-[10px] mr-1"></i> ${chondo.author}</p>
+              <div class="bg-slate-50 p-3 rounded-lg mt-3 text-center">
+                <p class="text-xs text-slate-600 line-clamp-3 leading-loose italic whitespace-pre-line">${chondo.content}</p>
+              </div>
+            </div>
+
+            <!-- Card Actions -->
+            <div class="flex items-center justify-end gap-2 border-t border-slate-100 mt-4 pt-3">
+              <button onclick="prepareEditItem('chondo', ${chondo.id})" class="p-2 text-primary hover:bg-primary/5 rounded-lg text-xs transition-all font-bold flex items-center gap-1">
+                <i class="fa-solid fa-pen-to-square"></i> এডিট
+              </button>
+              <button onclick="requestDeleteItem('chondo', ${chondo.id}, '${chondo.title.replace(/'/g, "\\'")}')" class="p-2 text-red-500 hover:bg-red-500/5 rounded-lg text-xs transition-all font-bold flex items-center gap-1">
+                <i class="fa-solid fa-trash-can"></i> ডিলিট
+              </button>
+            </div>
+          </div>
+        `;
+        chondosBox.innerHTML += itemHtml;
+      });
+
+      filterContentList();
+    }
+
+    // Realtime UI search filter implementation
+    function filterContentList() {
+      const q = document.getElementById("searchInput").value.toLowerCase().trim();
+      const currentBoxId = activeListFilter === 'story' ? 'storiesList' : 'chondosList';
+      const nodes = document.querySelectorAll(`#${currentBoxId} .search-item-node`);
+      
+      let visibleCount = 0;
+      nodes.forEach((node) => {
+        const title = node.getAttribute("data-title").toLowerCase();
+        const author = node.getAttribute("data-author").toLowerCase();
+        if (title.includes(q) || author.includes(q)) {
+          node.classList.remove("hidden");
+          node.classList.add("flex");
+          visibleCount++;
+        } else {
+          node.classList.remove("flex");
+          node.classList.add("hidden");
+        }
+      });
+
+      const placeholder = document.getElementById("noContentPlaceholder");
+      if (visibleCount === 0) {
+        placeholder.classList.remove("hidden");
+      } else {
+        placeholder.classList.add("hidden");
+      }
+    }
+
+    // Populate Creator form with existing content node for edits
+    function prepareEditItem(type, id) {
+      if (type === 'story') {
+        const story = stories[id];
+        if (!story) return;
+
+        switchFormTab('story');
+        document.getElementById("editItemId").value = id;
+        document.getElementById("titleInput").value = story.title;
+        document.getElementById("authorInput").value = story.author;
+        document.getElementById("categorySelect").value = story.category || "শিক্ষা ও নৈতিকতা";
+        document.getElementById("pageCountInput").value = story.pageCount || 5;
+        document.getElementById("descriptionInput").value = story.description || "";
+        document.getElementById("contentInput").value = story.content || "";
+
+        document.getElementById("submitBtnText").innerText = "গল্পের তথ্য আপডেট করুন";
+      } else {
+        const chondo = chondos[id];
+        if (!chondo) return;
+
+        switchFormTab('chondo');
+        document.getElementById("editItemId").value = id;
+        document.getElementById("titleInput").value = chondo.title;
+        document.getElementById("authorInput").value = chondo.author;
+        document.getElementById("contentInput").value = chondo.content || "";
+        document.getElementById("gradientIndexInput").value = chondo.gradientIndex || 0;
+        selectGradient(chondo.gradientIndex || 0);
+
+        document.getElementById("submitBtnText").innerText = "ছন্দের তথ্য আপডেট করুন";
+      }
+
+      document.getElementById("cancelEditBtn").classList.remove("hidden");
+      document.getElementById("contentForm").scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Submit handler - handles both adding new content and editing existing items
+    function handleFormSubmit(event) {
+      event.preventDefault();
+
+      const type = document.getElementById("activeFormType").value;
+      const idInput = document.getElementById("editItemId").value;
+      const title = document.getElementById("titleInput").value.trim();
+      const author = document.getElementById("authorInput").value.trim();
+      const content = document.getElementById("contentInput").value.trim();
+
+      if (!title || !author || !content) {
+        showToast("সবুজ তারকা চিহ্নিত ফিল্ডগুলো অবশ্যই পূরণ করুন!", true);
+        return;
+      }
+
+      if (type === 'story') {
+        const category = document.getElementById("categorySelect").value;
+        const pageCount = parseInt(document.getElementById("pageCountInput").value) || 5;
+        const desc = document.getElementById("descriptionInput").value.trim() || "চমৎকার শিক্ষণীয় ও বিনোদনমূলক গল্প।";
+        
+        let storyId = idInput ? parseInt(idInput) : Date.now();
+        
+        const payload = {
+          id: storyId,
+          title: title,
+          author: author,
+          category: category,
+          description: desc,
+          content: content,
+          isDownloaded: true,
+          isFavorite: false,
+          lastReadPage: 0,
+          lastReadTime: 0,
+          pageCount: pageCount,
+          publishDate: "আজ"
+        };
+
+        // Preserving existing state properties if editing
+        if (idInput && stories[storyId]) {
+          payload.isFavorite = stories[storyId].isFavorite || false;
+          payload.lastReadPage = stories[storyId].lastReadPage || 0;
+          payload.lastReadTime = stories[storyId].lastReadTime || 0;
+          payload.publishDate = stories[storyId].publishDate || "আজ";
+        }
+
+        database.ref('stories/' + storyId).set(payload)
+          .then(() => {
+            showToast(idInput ? "গল্পের তথ্য সফলভাবে আপডেট করা হয়েছে!" : "নতুন গল্পটি সফলভাবে প্রকাশ করা হয়েছে!");
+            resetFormState();
+          })
+          .catch((err) => {
+            showToast("আপলোড ব্যর্থ হয়েছে: " + err.message, true);
+          });
+
+      } else {
+        const gradientIndex = parseInt(document.getElementById("gradientIndexInput").value) || 0;
+        let chondoId = idInput ? parseInt(idInput) : Date.now();
+
+        const payload = {
+          id: chondoId,
+          title: title,
+          author: author,
+          content: content,
+          gradientIndex: gradientIndex,
+          isBookmarked: false,
+          isFavorite: false,
+          isSavedOffline: true,
+          publishDate: "আজ"
+        };
+
+        // Preserving favorite/bookmarked states if editing
+        if (idInput && chondos[chondoId]) {
+          payload.isFavorite = chondos[chondoId].isFavorite || false;
+          payload.isBookmarked = chondos[chondoId].isBookmarked || false;
+          payload.publishDate = chondos[chondoId].publishDate || "আজ";
+        }
+
+        database.ref('chondos/' + chondoId).set(payload)
+          .then(() => {
+            showToast(idInput ? "ছন্দের তথ্য সফলভাবে আপডেট করা হয়েছে!" : "নতুন ছন্দটি সফলভাবে প্রকাশ করা হয়েছে!");
+            resetFormState();
+          })
+          .catch((err) => {
+            showToast("আপলোড ব্যর্থ হয়েছে: " + err.message, true);
+          });
+      }
+    }
+
+    // Clear form and reset to default uploading mode
+    function resetFormState(resetFormType = true) {
+      document.getElementById("editItemId").value = "";
+      document.getElementById("titleInput").value = "";
+      document.getElementById("authorInput").value = "";
+      document.getElementById("contentInput").value = "";
+      
+      if (activeFormTab === 'story') {
+        document.getElementById("categorySelect").value = "শিক্ষা ও নৈতিকতা";
+        document.getElementById("pageCountInput").value = "5";
+        document.getElementById("descriptionInput").value = "";
+        document.getElementById("submitBtnText").innerText = "গল্পটি প্রকাশ করুন";
+      } else {
+        document.getElementById("gradientIndexInput").value = "0";
+        selectGradient(0);
+        document.getElementById("submitBtnText").innerText = "ছন্দটি প্রকাশ করুন";
+      }
+
+      document.getElementById("cancelEditBtn").classList.add("hidden");
+    }
+
+    // Modal Trigger to delete stories/rhymes safely
+    let itemToDeleteType = null;
+    let itemToDeleteId = null;
+
+    function requestDeleteItem(type, id, title) {
+      itemToDeleteType = type;
+      itemToDeleteId = id;
+      
+      document.getElementById("deleteItemTitle").innerText = title;
+      
+      const modal = document.getElementById("deleteModal");
+      modal.classList.remove("hidden");
+      setTimeout(() => {
+        modal.classList.remove("opacity-0");
+        modal.querySelector("div").classList.remove("scale-95");
+      }, 50);
+
+      document.getElementById("confirmDeleteBtn").onclick = () => {
+        executeDelete();
+      };
+    }
+
+    // Execute deletion node request directly to Firebase
+    function executeDelete() {
+      if (!itemToDeleteType || !itemToDeleteId) return;
+
+      const path = itemToDeleteType === 'story' ? 'stories/' : 'chondos/';
+      database.ref(path + itemToDeleteId).remove()
+        .then(() => {
+          showToast("আইটেমটি সফলভাবে মুছে ফেলা হয়েছে!");
+          closeDeleteModal();
+        })
+        .catch((err) => {
+          showToast("মুছে ফেলতে ত্রুটি হয়েছে: " + err.message, true);
+          closeDeleteModal();
+        });
+    }
+
+    function closeDeleteModal() {
+      const modal = document.getElementById("deleteModal");
+      modal.classList.add("opacity-0");
+      modal.querySelector("div").classList.add("scale-95");
+      setTimeout(() => {
+        modal.classList.add("hidden");
+        itemToDeleteType = null;
+        itemToDeleteId = null;
+      }, 300);
+    }
+
+    // Custom aesthetic floating Toast notifications
+    function showToast(message, isError = false) {
+      const toast = document.getElementById("toast");
+      const toastIcon = document.getElementById("toastIcon");
+      const toastMsg = document.getElementById("toastMessage");
+
+      if (isError) {
+        toastIcon.innerHTML = '<i class="fa-solid fa-circle-exclamation text-red-500"></i>';
+        toast.className = "fixed bottom-6 right-6 z-50 transform translate-y-0 opacity-100 flex items-center gap-3 bg-red-950 text-red-100 px-5 py-3 rounded-xl shadow-lg border border-red-900";
+      } else {
+        toastIcon.innerHTML = '<i class="fa-solid fa-circle-check text-accent"></i>';
+        toast.className = "fixed bottom-6 right-6 z-50 transform translate-y-0 opacity-100 flex items-center gap-3 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-lg border border-slate-800";
+      }
+
+      toastMsg.innerText = message;
+      
+      // Auto dismiss
+      setTimeout(() => {
+        toast.className = "fixed bottom-6 right-6 z-50 transform translate-y-10 opacity-0 pointer-events-none flex items-center gap-3 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-lg border border-slate-800";
+      }, 3500);
+    }
+
+    // Sign out Admin Simulation (simulated for security)
+    function logoutAdmin() {
+      showToast("সফলভাবে লগআউট করা হয়েছে!", false);
+      setTimeout(() => {
+        window.close();
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
